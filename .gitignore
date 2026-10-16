@@ -58,6 +58,7 @@ Thumbs.db
 /Dockerfile.bench.v2
 /scopeweaver
 /scopeweaver.exe
+*.exe
 /scopeweaver.new
 /scopeweaver.new.sha256
 /scopeweaver.old

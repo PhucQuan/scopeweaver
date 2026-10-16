@@ -12,6 +12,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    ports:
+      - "127.0.0.1:5433:5432"
     restart: unless-stopped
 
   scopeweaver:
@@ -29,6 +31,7 @@ services:
       ARTEX_LLM_PROVIDER: ${ARTEX_LLM_PROVIDER:-}
       ARTEX_LLM_MODEL: ${ARTEX_LLM_MODEL:-}
       ARTEX_LLM_BASE_URL: ${ARTEX_LLM_BASE_URL:-}
+      ARTEX_LLM_STREAM: ${ARTEX_LLM_STREAM:-false}
       ARTEX_LLM_PROXY: ${ARTEX_LLM_PROXY:-}
     ports:
       - "8787:8787"
