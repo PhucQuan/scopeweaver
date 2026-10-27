@@ -2,10 +2,12 @@ package server
 
 import (
 	"crypto/rand"
+	"fmt"
 	"github.com/Autumn-27/artex/locale"
 	"log"
 	"math/big"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -283,4 +285,68 @@ func (s *Server) authLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, 200, map[string]any{"token": tok})
+}
+
+// autoLogin issues a JWT token, sets the artex_token cookie, and injects it into localStorage
+// before redirecting to the target URL (default /function/tasks/detail?id=1).
+func (s *Server) autoLogin(w http.ResponseWriter, r *http.Request) {
+	// Both entry points bypass the /api/ middleware; validate explicitly before
+	// issuing a replacement JWT. A URL parameter must not grant authentication.
+	provided := ""
+	if header := r.Header.Get("Authorization"); strings.HasPrefix(header, "Bearer ") {
+		provided = strings.TrimPrefix(header, "Bearer ")
+	} else if cookie, err := r.Cookie("artex_token"); err == nil {
+		provided = cookie.Value
+	}
+	if provided == "" || !verifyJWT(provided, s.jwtKey) {
+		writeErr(w, http.StatusUnauthorized, "Cần phiên đăng nhập hợp lệ")
+		return
+	}
+	target := r.URL.Query().Get("target")
+	if target == "" {
+		target = "/function/tasks/detail?id=1"
+	}
+	parsed, err := url.ParseRequestURI(target)
+	if err != nil || parsed.IsAbs() || parsed.Host != "" || !strings.HasPrefix(target, "/") ||
+		strings.HasPrefix(target, "//") || strings.ContainsAny(target, "<>\\\r\n") {
+		writeErr(w, http.StatusBadRequest, "Đường chuyển hướng không hợp lệ")
+		return
+	}
+	tok, err := signJWT(s.jwtKey)
+	if err != nil {
+		writeErr(w, 500, "Token generation failed")
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "artex_token",
+		Value:    tok,
+		Path:     "/",
+		MaxAge:   7 * 86400,
+		HttpOnly: true,
+		Secure:   r.TLS != nil,
+		SameSite: http.SameSiteLaxMode,
+	})
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ScopeWeaver Authenticating...</title>
+</head>
+<body style="background:#090d16;color:#e2e8f0;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+  <div style="text-align:center;">
+    <div style="margin-bottom:12px;font-size:18px;font-weight:600;letter-spacing:0.05em;">INITIALIZING SCOPEWEAVER CONSOLE...</div>
+    <div style="font-size:13px;color:#94a3b8;">Authenticating AI Pentest workspace</div>
+  </div>
+  <script>
+    try {
+      localStorage.setItem("artex_token", %q);
+    } catch (e) {
+      console.error(e);
+    }
+    window.location.replace(%q);
+  </script>
+</body>
+</html>`, tok, target)
 }

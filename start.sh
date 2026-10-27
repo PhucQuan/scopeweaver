@@ -10,6 +10,17 @@ msg(){ if [ "$LANG_SEL" = ko ]; then printf '%s' "$2"; else printf '%s' "$1"; fi
 
 cd "$(dirname "$0")" || exit 1
 
+# Named volumes created before this image keep their old skills. Seed only
+# missing Strix bundles; do not overwrite changes made through the Skills UI.
+if [ -d /app/bundled-skills ]; then
+	mkdir -p /app/skills
+	for bundle in /app/bundled-skills/strix-*; do
+		[ -f "$bundle/SKILL.md" ] || continue
+		dest="/app/skills/$(basename "$bundle")"
+		[ -e "$dest" ] || cp -R "$bundle" "$dest"
+	done
+fi
+
 BIN=./scopeweaver
 [ -x "$BIN" ] || { echo "[ScopeWeaver] $(msg "Executable not found: $BIN" "실행 파일을 찾을 수 없습니다: $BIN")" >&2; exit 1; }
 

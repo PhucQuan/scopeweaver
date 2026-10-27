@@ -37,8 +37,10 @@ COPY --from=backend /scopeweaver /app/scopeweaver
 COPY start.sh /app/start.sh
 RUN chmod +x /app/scopeweaver /app/start.sh
 COPY skills/ /app/skills/
+COPY skills/ /app/bundled-skills/
 COPY LICENSE /app/LICENSE
 COPY THIRD_PARTY_NOTICES.txt /app/THIRD_PARTY_NOTICES.txt
+COPY docs/third_party/STRIX_APACHE-2.0.txt /app/third_party/STRIX_APACHE-2.0.txt
 VOLUME ["/app/data"]
 EXPOSE 8787 8788
 ENTRYPOINT ["/app/start.sh"]

@@ -17,6 +17,8 @@ bench/seed_v2.sh
 /scopeweaver
 /scopeweaver.exe
 .env
+*.log
+*.exe
 config.json
 jwt.key
 dist

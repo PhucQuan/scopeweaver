@@ -944,6 +944,8 @@ func (s *Server) Handler() http.Handler {
 	api := withLocale(cors(s.requireAuth(mux)))
 	root := http.NewServeMux()
 	root.Handle("/api/", api)
+	root.HandleFunc("/auto-login", s.autoLogin)
+	root.HandleFunc("/api/auth/auto-login", s.autoLogin)
 	root.Handle("/", s.webuiHandler())
 	return root
 }

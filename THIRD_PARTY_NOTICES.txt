@@ -24,3 +24,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Strix skill references, copyright their respective contributors.
+Source: https://github.com/usestrix/strix/tree/14cc948c36e90517a774cf32bdfe5d8cd3605b62/strix/skills
+Commit: 14cc948c36e90517a774cf32bdfe5d8cd3605b62
+69 original Markdown skill references from nine categories are preserved under
+skills/strix-*/references/. ScopeWeaver SKILL.md wrappers are adaptations.
+The six coordination and scan-mode documents are excluded because they assume
+Strix's agent/runtime model. Licensed under Apache-2.0; full license copy:
+docs/third_party/STRIX_APACHE-2.0.txt (or /app/third_party/STRIX_APACHE-2.0.txt in the image).
